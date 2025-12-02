@@ -41,6 +41,12 @@ def main():
     logging.info("Fetching unarchived modmails...")
     modmails = subreddit.modmail.conversations(state='all')
 
+    # count number of modmails
+    modmails = list(modmails)
+    logging.info(f"Got {len(modmails)} modmail(s).")
+
+
+
     # For each message in modmails
     for conversation in modmails:
         logging.info(f"Modmail ID: {conversation.id}. State: {conversation.state}")
@@ -66,7 +72,7 @@ def main():
                 logging.error(f"Error during processing: {e}")
 
         else:
-            logging.info("Modmail not from admin-tattler. Skipping...")
+            logging.info("└ Modmail not from admin-tattler. Skipping...")
 
 
 if __name__ == "__main__":
