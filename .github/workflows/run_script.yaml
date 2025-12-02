@@ -41,10 +41,10 @@ jobs:
         env:
           NOT_DOTENV: ${{ vars.NOT_DOTENV }}
           LOG_LEVEL: ${{ vars.LOG_LEVEL }}
-          REDDIT_CLIENT_ID: ${{ vars.REDDIT_CLIENT_ID }}
-          REDDIT_CLIENT_SECRET: ${{ vars.REDDIT_CLIENT_SECRET }}
-          REDDIT_USER_AGENT: ${{ vars.REDDIT_USER_AGENT }}
-          REDDIT_REFRESH_TOKEN: ${{ vars.REDDIT_REFRESH_TOKEN }}
+          REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
+          REDDIT_REFRESH_TOKEN: ${{ secrets.REDDIT_REFRESH_TOKEN }}
         run: |
           # make sure logs folder exists
           mkdir -p logs
