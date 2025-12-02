@@ -45,8 +45,6 @@ def main():
     modmails = list(modmails)
     logging.info(f"Got {len(modmails)} modmail(s).")
 
-
-
     # For each message in modmails
     for conversation in modmails:
         logging.info(f"Modmail ID: {conversation.id}. State: {conversation.state}")
