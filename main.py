@@ -65,6 +65,8 @@ def main():
             except Exception as e:
                 logging.error(f"Error during processing: {e}")
 
+        else:
+            logging.info("Modmail not from admin-tattler. Skipping...")
 
 
 if __name__ == "__main__":
