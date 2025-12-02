@@ -1,0 +1,135 @@
+name: placeholder
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write       # required for pushing commits
+  pull-requests: write  # required for merging PRs
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          ref: master
+
+      - name: Clear existing files in logs/, except for placeholder.txt
+        run: |
+          find logs/ -type f ! -name 'placeholder.txt' -delete
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run script
+        id: run_py_script
+        env:
+          NOT_DOTENV: ${{ vars.NOT_DOTENV }}
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
+          REDDIT_CLIENT_ID: ${{ vars.REDDIT_CLIENT_ID }}
+          REDDIT_CLIENT_SECRET: ${{ vars.REDDIT_CLIENT_SECRET }}
+          REDDIT_USER_AGENT: ${{ vars.REDDIT_USER_AGENT }}
+          REDDIT_REFRESH_TOKEN: ${{ vars.REDDIT_REFRESH_TOKEN }}
+        run: |
+          # make sure logs folder exists
+          mkdir -p logs
+       
+          # create timestamp
+          timestamp=$(date "+%Y-%m-%d-%H%M%S")
+          echo "timestamp=$timestamp" >> "$GITHUB_OUTPUT"
+
+          # create log file
+          log_file=logs/${timestamp}.txt
+
+          # creates output var called "log_file"
+          echo "log_file=$log_file" >> "$GITHUB_OUTPUT"
+
+          # run python file, redirects output to logfile, redirects stdout and stderr there too
+          python main.py > "$log_file" 2>&1
+
+      - name: Show log file if script fails
+        if: failure()
+        run: |
+          echo "Showing contents of log file:"
+          cat logs/${{ steps.run_py_script.outputs.timestamp }}.txt
+
+      - name: Stage new log files
+        run: |
+          git add logs/
+
+      - name: Gather file changes
+        id: file_changes
+        run: |
+          echo "Git diff output:"
+          git diff --name-status origin/master
+
+          added=$(git diff --name-only --diff-filter=A origin/master | sed 's/^/+ /')
+          deleted=$(git diff --name-only --diff-filter=D origin/master | sed 's/^/- /')
+
+          echo "Added files:"
+          echo "$added"
+          echo "Deleted files:"
+          echo "$deleted"
+
+          echo "pr_body<<EOF" >> "$GITHUB_OUTPUT"
+          echo '```diff' >> "$GITHUB_OUTPUT"
+          echo "$deleted" >> "$GITHUB_OUTPUT"
+          echo "$added" >> "$GITHUB_OUTPUT"
+          echo '```' >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Update logs: ${{ steps.run_py_script.outputs.timestamp }}"
+          branch: log-update-${{ steps.run_py_script.outputs.timestamp }}
+          title: "Automated log update - ${{ steps.run_py_script.outputs.timestamp }}"
+          body: ${{ steps.file_changes.outputs.pr_body }}
+          base: master
+          add-paths: |
+            logs/**
+          committer: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+
+      - name: Enable auto-merge for PR
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+        run: |
+          echo "Enabling auto-merge for PR #$PR_NUMBER"
+          gh pr merge $PR_NUMBER --auto --merge
+
+
+      - name: Delete branch after merge
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
+          BRANCH_NAME: log-update-${{ steps.run_py_script.outputs.timestamp }}
+        run: |
+          echo "Checking merge status for PR #$PR_NUMBER..."
+          MERGED_AT=$(gh pr view "$PR_NUMBER" --json mergedAt --jq '.mergedAt')
+          if [ -n "$MERGED_AT" ]; then
+            echo "PR #$PR_NUMBER was merged at $MERGED_AT. Deleting branch $BRANCH_NAME..."
+            gh api -X DELETE repos/${{ github.repository }}/git/refs/heads/$BRANCH_NAME
+          else
+            echo "PR #$PR_NUMBER not yet merged. Skipping branch deletion."
+          fi
