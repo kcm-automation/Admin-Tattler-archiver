@@ -2,6 +2,8 @@ name: placeholder
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 * * * *" # runs every hour on the hour
 
 permissions:
   contents: write       # required for pushing commits
