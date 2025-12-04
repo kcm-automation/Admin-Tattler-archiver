@@ -116,9 +116,20 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
         run: |
-          echo "Enabling auto-merge for PR #$PR_NUMBER"
-          gh pr merge $PR_NUMBER --auto --merge
+          echo "Enabling auto-merge for PR #${PR_NUMBER}"
 
+          for i in {1..5}; do
+            echo "Attempt $i..."
+            if gh pr merge "$PR_NUMBER" --auto --merge; then
+              echo "Auto-merge enabled successfully."
+              exit 0
+            fi
+            echo "Failed. Retrying in 5 seconds..."
+            sleep 5
+          done
+
+          echo "Failed to enable auto-merge after multiple attempts."
+          exit 1
 
       - name: Delete branch after merge
         if: steps.cpr.outputs.pull-request-number != ''
