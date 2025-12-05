@@ -1,0 +1,9 @@
+2025-12-05 15:28:57,339 - INFO - Successfully authenticated
+2025-12-05 15:28:57,339 - INFO - Fetching unarchived modmails...
+2025-12-05 15:28:57,621 - INFO - Got 3 modmail(s).
+2025-12-05 15:28:57,621 - INFO - Modmail ID: 32dmgv. State: 0
+2025-12-05 15:28:58,467 - INFO - Conversation was archived
+2025-12-05 15:28:58,467 - INFO - Modmail ID: 32dmgt. State: 0
+2025-12-05 15:28:59,385 - INFO - Conversation was archived
+2025-12-05 15:28:59,386 - INFO - Modmail ID: 32c4wy. State: 0
+2025-12-05 15:28:59,386 - INFO - └ Modmail not from admin-tattler. Skipping...
