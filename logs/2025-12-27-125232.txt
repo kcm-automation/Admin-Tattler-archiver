@@ -1,7 +1,0 @@
-2025-12-27 12:52:33,824 - INFO - Successfully authenticated
-2025-12-27 12:52:33,824 - INFO - Fetching unarchived modmails...
-2025-12-27 12:52:34,027 - INFO - Got 2 modmail(s).
-2025-12-27 12:52:34,027 - INFO - Modmail ID: 33vemu. State: 0
-2025-12-27 12:52:34,938 - INFO - Conversation was archived
-2025-12-27 12:52:34,938 - INFO - Modmail ID: 2zxatx. State: 1
-2025-12-27 12:52:35,164 - INFO - └ Modmail not from admin-tattler. Skipping...
