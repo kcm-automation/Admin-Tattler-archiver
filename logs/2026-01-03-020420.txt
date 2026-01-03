@@ -1,0 +1,9 @@
+2026-01-03 02:04:21,769 - INFO - Successfully authenticated
+2026-01-03 02:04:21,769 - INFO - Fetching unarchived modmails...
+2026-01-03 02:04:22,057 - INFO - Got 3 modmail(s).
+2026-01-03 02:04:22,057 - INFO - Modmail ID: 34bvmv. State: 0
+2026-01-03 02:04:22,984 - INFO - Conversation was archived
+2026-01-03 02:04:22,984 - INFO - Modmail ID: 346mc0. State: 0
+2026-01-03 02:04:22,984 - INFO - └ Modmail not from admin-tattler. Skipping...
+2026-01-03 02:04:22,984 - INFO - Modmail ID: 2zxatx. State: 1
+2026-01-03 02:04:23,258 - INFO - └ Modmail not from admin-tattler. Skipping...
